@@ -2,113 +2,968 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Career AI</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Hệ thống tư vấn hướng nghiệp AI cho học sinh THPT Việt Nam">
+<title>HướngNghiệp AI</title>
 <style>
-body{font-family:Arial;background:#f6f6f6;padding:30px}
-.card{background:#fff;padding:20px;border-radius:12px;margin-bottom:20px}
-.result-card{padding:20px;border-radius:12px;margin-top:20px;color:#222}
-.good{background:#E9F9EE;border:2px solid #2A9D8F}
-.warning{background:#FFF8E6;border:2px solid #E9C46A}
-.bad{background:#FFECEC;border:2px solid #E76F51}
-.dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px}
-.dot.green{background:#2A9D8F}
-.dot.yellow{background:#E9C46A}
-.dot.red{background:#E76F51}
-button{padding:8px 16px;border:none;border-radius:8px;background:#2A9D8F;color:white;cursor:pointer}
-textarea{width:100%;height:100px;padding:10px}
+/* ── RESET & BASE ── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F5F0;--ink:#1A1A18;--ink2:#5C5C58;--ink3:#A8A8A2;
+  --green:#2D6A4F;--green-lt:#E8F4EE;--orange:#E76F51;
+  --line:#E2DFD8;--white:#fff;
+  --status-green:#2A9D8F;--status-green-bg:#E9F9EE;--status-green-border:#2A9D8F;
+  --status-yellow:#D4A017;--status-yellow-bg:#FFF8E6;--status-yellow-border:#E9C46A;
+  --status-red:#C0392B;--status-red-bg:#FFECEC;--status-red-border:#E76F51;
+  --f: Georgia,'Times New Roman',serif;
+  --s: system-ui,-apple-system,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--s);font-size:16px;line-height:1.65}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:99;
+  background:var(--bg);border-bottom:1px solid var(--line);
+  padding:0 4vw;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{font-family:var(--f);font-size:1.15rem;color:var(--ink);text-decoration:none}
+.logo span{color:var(--green)}
+.nav-links{display:flex;gap:1.25rem;list-style:none}
+.nav-links a{font-size:.82rem;font-weight:500;color:var(--ink2);text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.nav-cta{background:var(--ink)!important;color:var(--white)!important;padding:.35rem .9rem;border-radius:5px}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1060px;margin:0 auto;padding:0 4vw}
+section{padding:72px 4vw;border-top:1px solid var(--line)}
+.lbl{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:.6rem}
+.ttl{font-family:var(--f);font-size:clamp(1.85rem,4vw,2.6rem);line-height:1.15;margin-bottom:.9rem}
+.ttl em{font-style:italic;color:var(--green)}
+.sub{font-size:.97rem;color:var(--ink2);max-width:540px;line-height:1.75;margin-bottom:3rem}
+
+/* ── HERO ── */
+#hero{border-top:none;padding-top:80px;padding-bottom:64px}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;max-width:1060px;margin:0 auto}
+.eyebrow{display:flex;align-items:center;gap:8px;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:1.25rem}
+.eyebrow::before{content:'';width:18px;height:2px;background:var(--green)}
+.hero-title{font-family:var(--f);font-size:clamp(2.4rem,5vw,3.6rem);line-height:1.1;margin-bottom:1.25rem}
+.hero-title em{font-style:italic;color:var(--green)}
+.hero-desc{font-size:1rem;color:var(--ink2);line-height:1.75;margin-bottom:2rem;max-width:460px}
+.btn-row{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn-p{background:var(--ink);color:var(--white);padding:.8rem 1.75rem;border-radius:7px;font-family:var(--s);font-size:.92rem;font-weight:500;text-decoration:none;display:inline-block}
+.btn-p:hover{background:var(--green)}
+.btn-s{background:transparent;color:var(--ink);padding:.8rem 1.75rem;border-radius:7px;border:1.5px solid var(--line);font-family:var(--s);font-size:.92rem;font-weight:500;text-decoration:none;display:inline-block}
+.btn-s:hover{border-color:var(--ink)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stat{background:var(--white);padding:1.75rem 1.5rem}
+.stat-n{font-family:var(--f);font-size:2.6rem;line-height:1;margin-bottom:.3rem}
+.stat-n span{color:var(--green)}
+.stat-l{font-size:.8rem;color:var(--ink2);line-height:1.4}
+
+/* ── PROBLEM ── */
+.prob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.prob-card{background:var(--white);padding:2rem 1.75rem}
+.prob-pct{font-family:var(--f);font-size:3.2rem;line-height:1;color:var(--orange);margin-bottom:.6rem}
+.prob-txt{font-size:.88rem;color:var(--ink2);line-height:1.6}
+.prob-txt strong{color:var(--ink)}
+
+/* ── HOW ── */
+#how{background:var(--ink)}
+#how .lbl{color:rgba(255,255,255,.35)}
+#how .ttl{color:var(--white)}
+#how .ttl em{color:#74C69D}
+#how .sub{color:rgba(255,255,255,.5)}
+.steps{display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:64px 1fr;gap:1.5rem;align-items:start;padding:1.75rem 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.step:last-child{border-bottom:none}
+.step-n{font-family:var(--f);font-size:2.75rem;line-height:1;color:rgba(255,255,255,.12)}
+.step-ttl{font-size:1rem;font-weight:600;color:var(--white);margin-bottom:.35rem}
+.step-desc{font-size:.88rem;color:rgba(255,255,255,.5);line-height:1.6}
+.tag{display:inline-block;margin-top:.5rem;background:rgba(116,198,157,.15);color:#74C69D;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.22rem .6rem;border-radius:3px}
+
+/* ── AI TECH ── */
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start;margin-top:3rem}
+.ai-text p{font-size:.93rem;color:var(--ink2);line-height:1.8;margin-bottom:1.1rem}
+.ai-text p strong{color:var(--ink)}
+.pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.25rem}
+.pill{background:var(--green-lt);color:var(--green);font-size:.75rem;font-weight:700;padding:.28rem .75rem;border-radius:20px}
+.diagram{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:1.75rem}
+.d-title{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:1.25rem}
+
+/* ── VALUE ── */
+#value{background:var(--green-lt);border-top:1px solid #C8E6D8}
+.val-contrast{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:2rem}
+.vc-col{padding:1.75rem}
+.vc-col:first-child{background:#FFF8F6}
+.vc-col:last-child{background:var(--green-lt)}
+.vc-head{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.9rem}
+.vc-col:first-child .vc-head{color:#C0775A}
+.vc-col:last-child .vc-head{color:var(--green)}
+.vc-list{list-style:none;display:flex;flex-direction:column;gap:.55rem}
+.vc-list li{font-size:.85rem;color:var(--ink2);padding-left:1.1rem;position:relative}
+.vc-list li::before{position:absolute;left:0}
+.vc-col:first-child .vc-list li::before{content:'✗';color:#D0A090}
+.vc-col:last-child .vc-list li::before{content:'✓';color:var(--green)}
+.val-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:.5rem}
+.val-card{background:var(--white);border-radius:9px;padding:1.75rem;border:1px solid #D4EBE0}
+.val-icon{font-size:1.2rem;margin-bottom:.75rem;display:block}
+.val-card h3{font-size:.92rem;font-weight:600;margin-bottom:.4rem}
+.val-card p{font-size:.84rem;color:var(--ink2);line-height:1.65}
+.impact{background:var(--white);border-radius:9px;padding:1.75rem;margin-top:1.25rem;border:1px solid #D4EBE0;display:flex;gap:1.25rem;align-items:flex-start}
+.impact-ico{font-size:1.75rem;flex-shrink:0}
+.impact-txt strong{display:block;font-size:.92rem;margin-bottom:.25rem}
+.impact-txt span{font-size:.83rem;color:var(--ink2);line-height:1.6}
+
+/* ── FORM ── */
+#try{border-top:1px solid var(--line)}
+.form-wrap{max-width:620px;margin:2.5rem auto 0;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:2.25rem}
+.progress-bar{height:3px;background:var(--line);border-radius:2px;margin-bottom:1.75rem;overflow:hidden}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;width:8%;transition:width .4s ease}
+.form-step{display:none}
+.form-step.active{display:block}
+
+/* ── STATUS BADGE ── */
+.status-badge{
+  display:none;
+  align-items:center;gap:.55rem;
+  padding:.55rem .9rem;
+  border-radius:7px;
+  border:1.5px solid;
+  margin-bottom:.85rem;
+  font-size:.82rem;
+  font-weight:500;
+  animation:fadeIn .2s ease;
+}
+.status-badge.visible{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.status-badge.green{
+  background:var(--status-green-bg);
+  border-color:var(--status-green-border);
+  color:var(--status-green);
+}
+.status-badge.yellow{
+  background:var(--status-yellow-bg);
+  border-color:var(--status-yellow-border);
+  color:var(--status-yellow);
+}
+.status-badge.red{
+  background:var(--status-red-bg);
+  border-color:var(--status-red-border);
+  color:var(--status-red);
+}
+.status-dot{
+  width:9px;height:9px;border-radius:50%;flex-shrink:0;
+}
+.status-badge.green .status-dot{background:var(--status-green)}
+.status-badge.yellow .status-dot{background:var(--status-yellow-border)}
+.status-badge.red .status-dot{background:var(--status-red-border)}
+
+/* Textarea border color changes with status */
+textarea.ans{
+  width:100%;
+  border:1.5px solid var(--line);
+  border-radius:8px;
+  padding:.8rem .9rem;
+  font-family:var(--s);
+  font-size:.9rem;
+  color:var(--ink);
+  background:var(--bg);
+  resize:vertical;
+  min-height:100px;
+  line-height:1.6;
+  outline:none;
+  transition:border-color .25s ease, background .25s ease;
+}
+textarea.ans:focus{background:var(--white)}
+textarea.ans.status-green{border-color:var(--status-green)}
+textarea.ans.status-yellow{border-color:var(--status-yellow-border)}
+textarea.ans.status-red{border-color:var(--status-red-border)}
+textarea.ans::placeholder{color:var(--ink3);font-size:.83rem}
+
+.ans-foot{display:flex;justify-content:space-between;align-items:center;margin-top:.35rem;min-height:1.1rem}
+.counter{font-size:.73rem;color:var(--ink3)}
+.counter.warn{color:var(--orange)}
+.btn-next{
+  width:100%;background:var(--ink);color:var(--white);border:none;
+  border-radius:7px;padding:.8rem 1.5rem;
+  font-family:var(--s);font-size:.9rem;font-weight:500;cursor:pointer;margin-top:.5rem;
+  transition:background .2s ease;
+}
+.btn-next:hover:not(:disabled){background:var(--green)}
+.btn-next:disabled{background:var(--line);color:var(--ink3);cursor:not-allowed}
+
+/* ── LOADING ── */
+#loading{display:none;padding:2.5rem 2rem;text-align:center}
+.spin{display:inline-block;width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--green);border-radius:50%;animation:spin .9s linear infinite;margin-bottom:1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-title{font-family:var(--f);font-size:1.1rem;margin-bottom:1.25rem}
+.l-steps{text-align:left;display:flex;flex-direction:column;gap:.4rem;max-width:340px;margin:0 auto}
+.l-step{font-size:.82rem;color:var(--ink3);padding:.4rem .7rem;border-radius:5px;border:1px solid transparent}
+.l-step.on{color:var(--green);background:var(--green-lt);border-color:#C8E6D8}
+.l-step.ok{color:var(--ink2)}
+.l-step.ok::before{content:'✓ '}
+
+/* ── RESULT ── */
+#result{display:none;padding:0}
+.r-head{text-align:center;margin-bottom:1.5rem}
+.r-head h2{font-family:var(--f);font-size:1.4rem;margin-bottom:.35rem}
+.r-head p{font-size:.85rem;color:var(--ink2)}
+.fv{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:1.1rem 1.25rem;margin-bottom:1.25rem;display:none}
+.fv-lbl{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:.65rem}
+.fv-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.fvt{font-size:.74rem;font-weight:700;padding:.25rem .65rem;border-radius:20px;border:1px solid}
+.fvt.r{background:var(--green-lt);color:var(--green);border-color:#C8E6D8}
+.fvt.a{background:#EEF2FF;color:#4F5BD5;border-color:#C7D0F8}
+.fvt.f{background:#FFF4EC;color:#C0613A;border-color:#F5D5C0}
+.fvt.g{background:#F5F0FF;color:#7B5EA7;border-color:#D9C8F0}
+.careers{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.25rem}
+.c-card{border:1.5px solid var(--line);border-radius:7px;padding:.9rem 1.1rem;display:flex;align-items:center;gap:.9rem}
+.c-card.top{border-color:var(--green);background:var(--green-lt)}
+.c-score{font-family:var(--f);font-size:1.35rem;color:var(--green);min-width:50px;text-align:center}
+.c-info h4{font-size:.9rem;font-weight:600;margin-bottom:.15rem}
+.c-info p{font-size:.77rem;color:var(--ink2)}
+.r-note{font-size:.76rem;color:var(--ink3);text-align:center;line-height:1.6;border-top:1px solid var(--line);padding-top:.9rem;margin-bottom:1.1rem}
+.btn-reset{display:block;width:100%;background:transparent;border:1.5px solid var(--line);border-radius:7px;padding:.75rem;font-family:var(--s);font-size:.87rem;font-weight:500;color:var(--ink);cursor:pointer}
+.btn-reset:hover{border-color:var(--ink)}
+
+/* ── FOOTER ── */
+footer{padding:2rem 4vw;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+.f-logo{font-family:var(--f);font-size:1rem}
+.f-logo span{color:var(--green)}
+.f-note{font-size:.76rem;color:var(--ink3)}
+
+/* ── ADAPTIVE Q&A EXTRAS ── */
+.step-track{display:flex;gap:.35rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex-shrink:0}
+.step-dot.done{background:var(--green)}
+.step-dot.active{background:var(--ink)}
+.step-dot.followup{background:var(--orange);width:6px;height:6px}
+
+.q-card{animation:qin .25s ease}
+@keyframes qin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.q-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.7rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem}
+.q-badge.core{color:var(--ink3)}
+.q-badge.followup{color:var(--orange)}
+.q-badge.followup::before{content:'↳ ';font-weight:400}
+
+.f-q{font-family:var(--f);font-size:1.2rem;line-height:1.3;margin-bottom:1.1rem;color:var(--ink)}
+
+.hint-chip{display:inline-block;font-size:.72rem;background:var(--green-lt);color:var(--green);
+  border:1px solid #C8E6D8;border-radius:4px;padding:.18rem .55rem;margin:.2rem .2rem 0 0;cursor:pointer}
+.hint-chip:hover{background:#D4EBE0}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .hero-grid,.ai-grid,.val-contrast,.val-grid,.prob-grid,.stats-grid{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .step{grid-template-columns:48px 1fr;gap:1rem}
+  .impact{flex-direction:column}
+  section{padding:52px 4vw}
+  #hero{padding-top:64px;padding-bottom:48px}
+}
 </style>
 </head>
 <body>
 
-<div class="card">
-<h3>Nhập câu trả lời của bạn</h3>
-<textarea id="input"></textarea>
-<br><br>
-<button onclick="analyze()">Phân tích</button>
-</div>
+<nav>
+  <a class="logo" href="#"><span>Hướng</span>Nghiệp AI</a>
+  <ul class="nav-links">
+    <li><a href="#problem">Vấn đề</a></li>
+    <li><a href="#how">Quy trình</a></li>
+    <li><a href="#ai">Công nghệ</a></li>
+    <li><a href="#value">Giá trị</a></li>
+    <li><a href="#try" class="nav-cta">Thử ngay</a></li>
+  </ul>
+</nav>
 
-<div id="result"></div>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow">AI-powered · Dữ liệu thực tế Việt Nam</div>
+      <h1 class="hero-title">Tìm ngành học<br><em>đúng với bạn</em><br>không phải đám đông</h1>
+      <p class="hero-desc">60% học sinh chọn sai ngành. Hệ thống phân tích hồ sơ cá nhân và khớp với hàng trăm nghề nghiệp — có điểm chuẩn và học phí thực tế của các trường Việt Nam.</p>
+      <div class="btn-row">
+        <a href="#try" class="btn-p">Bắt đầu miễn phí →</a>
+        <a href="#how" class="btn-s">Xem cách hoạt động</a>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-n"><span>60</span>%</div><div class="stat-l">học sinh chọn ngành chưa phù hợp với năng lực</div></div>
+      <div class="stat"><div class="stat-n"><span>75</span>%</div><div class="stat-l">chưa hiểu rõ nghề nghiệp tương lai trước khi chọn</div></div>
+      <div class="stat"><div class="stat-n"><span>65</span>%</div><div class="stat-l">sinh viên năm 1 chưa nắm rõ mục tiêu ngành học</div></div>
+      <div class="stat"><div class="stat-n"><span>20</span>%</div><div class="stat-l">bỏ học hoặc chuyển ngành sau năm đầu đại học</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="wrap">
+    <div class="lbl">Vấn đề</div>
+    <h2 class="ttl">Tại sao chọn ngành<br><em>lại khó đến vậy?</em></h2>
+    <p class="sub">Không phải học sinh thiếu thông minh — họ thiếu thông tin đúng và công cụ phân tích phù hợp với bối cảnh Việt Nam.</p>
+    <div class="prob-grid">
+      <div class="prob-card"><div class="prob-pct">60%</div><div class="prob-txt"><strong>Chọn ngành thiếu phù hợp</strong><br>Theo khảo sát Trung tâm Dự báo Nhân lực TP.HCM 2023 — đa số do thiếu công cụ phân tích cá nhân hóa.</div></div>
+      <div class="prob-card"><div class="prob-pct">75%</div><div class="prob-txt"><strong>Thiếu hiểu biết về nghề</strong><br>Phần lớn học sinh không có đủ thông tin về yêu cầu, môi trường làm việc và thu nhập thực tế của nghề.</div></div>
+      <div class="prob-card"><div class="prob-pct">60%</div><div class="prob-txt"><strong>Làm trái ngành sau tốt nghiệp</strong><br>Gần 60% lao động Việt Nam làm việc không liên quan đến chuyên ngành đào tạo — lãng phí 4–6 năm học.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap">
+    <div class="lbl">Quy trình</div>
+    <h2 class="ttl">5 bước từ thông tin<br><em>đến đề xuất</em></h2>
+    <p class="sub">Pipeline thiết kế theo chuẩn ML System — từ thu thập dữ liệu đến inference và constraint filtering.</p>
+    <div class="steps">
+      <div class="step"><div class="step-n">01</div><div><div class="step-ttl">Nhập thông tin cá nhân</div><div class="step-desc">Sở thích, năng lực học tập, điều kiện tài chính và mục tiêu nghề nghiệp — được thu thập qua 5 câu hỏi mở, trả lời bằng văn bản tự do.</div><span class="tag">Data collection</span></div></div>
+      <div class="step"><div class="step-n">02</div><div><div class="step-ttl">Trích xuất đặc trưng</div><div class="step-desc">Câu trả lời được phân tích qua keyword mapping ngữ nghĩa tiếng Việt, ánh xạ thành tín hiệu RIASEC, academic strength và financial constraint.</div><span class="tag">Feature extraction · NLP</span></div></div>
+      <div class="step"><div class="step-n">03</div><div><div class="step-ttl">Mã hóa vector & tính điểm</div><div class="step-desc">Các tín hiệu được tổng hợp thành vector hồ sơ với weighted scoring. Điểm tương đồng tính qua dot-product trong không gian RIASEC × O*NET.</div><span class="tag">Vector encoding · Similarity scoring</span></div></div>
+      <div class="step"><div class="step-n">04</div><div><div class="step-ttl">Lọc qua ràng buộc bản địa hóa</div><div class="step-desc">Điểm chuẩn và học phí thực tế của các trường đại học Việt Nam hoạt động như hard constraint — loại bỏ lộ trình không khả thi.</div><span class="tag">Constraint filtering · Localization</span></div></div>
+      <div class="step"><div class="step-n">05</div><div><div class="step-ttl">Đề xuất ngành nghề & lộ trình học</div><div class="step-desc">Hệ thống trả về danh sách ngành phù hợp nhất kèm gợi ý trường đại học và vector đặc trưng đã trích xuất để người dùng kiểm chứng.</div><span class="tag">Recommendation output</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- AI TECH -->
+<section id="ai">
+  <div class="wrap">
+    <div class="lbl">Công nghệ AI</div>
+    <h2 class="ttl">Không phải trắc nghiệm tính cách —<br><em>đây là AI System Design</em></h2>
+    <div class="ai-grid">
+      <div class="ai-text">
+        <p>Hệ thống chuyển bài toán hướng nghiệp thành <strong>bài toán tìm kiếm láng giềng gần nhất</strong> trong không gian đặc trưng nghề nghiệp đa chiều.</p>
+        <p>Câu trả lời văn bản tự do được phân tích qua <strong>keyword mapping ngữ nghĩa tiếng Việt</strong> — ánh xạ vào 6 chiều RIASEC và các đặc trưng bổ sung về học lực, tính cách, tài chính.</p>
+        <p>Điểm tương đồng tính bằng <strong>dot-product có trọng số</strong> trong không gian RIASEC × O*NET — tương đương cosine similarity trên đặc trưng rời rạc.</p>
+        <p>Toàn bộ pipeline chạy <strong>client-side trên trình duyệt</strong> — không phụ thuộc kết nối máy chủ trong lúc suy luận.</p>
+        <div class="pills">
+          <span class="pill">RIASEC Model</span><span class="pill">O*NET Database</span><span class="pill">Keyword NLP</span><span class="pill">Weighted Scoring</span><span class="pill">Feature Extraction</span><span class="pill">Constraint Filtering</span><span class="pill">Client-side Inference</span>
+        </div>
+      </div>
+      <div class="diagram">
+        <div class="d-title">Vector Space — Nearest Neighbor</div>
+        <svg viewBox="0 0 320 265" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+          <line x1="38" y1="232" x2="300" y2="232" stroke="#DDD" stroke-width="1.5"/>
+          <line x1="38" y1="232" x2="38" y2="18" stroke="#DDD" stroke-width="1.5"/>
+          <polygon points="298,228 305,232 298,236" fill="#DDD"/>
+          <polygon points="34,20 38,13 42,20" fill="#DDD"/>
+          <text x="306" y="236" font-size="8" fill="#AAA" font-family="sans-serif">Kỹ thuật</text>
+          <text x="5" y="130" font-size="8" fill="#AAA" font-family="sans-serif" transform="rotate(-90,5,130)">Xã hội</text>
+          <circle cx="228" cy="62" r="6" fill="#2D6A4F" opacity=".8"/>
+          <circle cx="252" cy="76" r="6" fill="#2D6A4F" opacity=".8"/>
+          <circle cx="210" cy="78" r="6" fill="#2D6A4F" opacity=".8"/>
+          <ellipse cx="235" cy="71" rx="35" ry="26" fill="none" stroke="#2D6A4F" stroke-width="1.2" stroke-dasharray="4,3" opacity=".4"/>
+          <text x="235" y="106" text-anchor="middle" font-size="8" fill="#2D6A4F" font-family="sans-serif">Kỹ thuật - CNTT</text>
+          <circle cx="86" cy="70" r="6" fill="#E76F51" opacity=".8"/>
+          <circle cx="107" cy="56" r="6" fill="#E76F51" opacity=".8"/>
+          <circle cx="72" cy="87" r="6" fill="#E76F51" opacity=".8"/>
+          <ellipse cx="88" cy="72" rx="34" ry="24" fill="none" stroke="#E76F51" stroke-width="1.2" stroke-dasharray="4,3" opacity=".4"/>
+          <text x="88" y="106" text-anchor="middle" font-size="8" fill="#E76F51" font-family="sans-serif">Y tế - Sức khỏe</text>
+          <circle cx="232" cy="180" r="6" fill="#7B5EA7" opacity=".8"/>
+          <circle cx="255" cy="165" r="6" fill="#7B5EA7" opacity=".8"/>
+          <circle cx="214" cy="190" r="6" fill="#7B5EA7" opacity=".8"/>
+          <ellipse cx="233" cy="178" rx="36" ry="24" fill="none" stroke="#7B5EA7" stroke-width="1.2" stroke-dasharray="4,3" opacity=".4"/>
+          <text x="233" y="212" text-anchor="middle" font-size="8" fill="#7B5EA7" font-family="sans-serif">Kinh doanh</text>
+          <circle cx="85" cy="176" r="6" fill="#E9C46A" opacity=".9"/>
+          <circle cx="106" cy="190" r="6" fill="#E9C46A" opacity=".9"/>
+          <circle cx="68" cy="190" r="6" fill="#E9C46A" opacity=".9"/>
+          <ellipse cx="86" cy="185" rx="34" ry="22" fill="none" stroke="#E9C46A" stroke-width="1.2" stroke-dasharray="4,3" opacity=".5"/>
+          <text x="86" y="218" text-anchor="middle" font-size="8" fill="#B8942A" font-family="sans-serif">Sư phạm - XH</text>
+          <circle cx="168" cy="130" r="10" fill="#1A1A18" stroke="white" stroke-width="2"/>
+          <text x="168" y="134" text-anchor="middle" font-size="8" fill="white" font-weight="bold" font-family="sans-serif">U</text>
+          <text x="168" y="120" text-anchor="middle" font-size="7.5" fill="#1A1A18" font-weight="600" font-family="sans-serif">Bạn</text>
+          <line x1="168" y1="130" x2="235" y2="71" stroke="#2D6A4F" stroke-width="1.8" stroke-dasharray="5,3"/>
+          <text x="210" y="92" font-size="7.5" fill="#2D6A4F" font-weight="600" font-family="sans-serif">d=0.21 ✓</text>
+          <line x1="168" y1="130" x2="233" y2="178" stroke="#CCC" stroke-width="1.2" stroke-dasharray="4,4"/>
+          <text x="212" y="163" font-size="7.5" fill="#AAA" font-family="sans-serif">d=0.48</text>
+          <line x1="168" y1="130" x2="88" y2="72" stroke="#CCC" stroke-width="1.2" stroke-dasharray="4,4"/>
+          <text x="112" y="93" font-size="7.5" fill="#AAA" font-family="sans-serif">d=0.61</text>
+          <line x1="168" y1="130" x2="86" y2="185" stroke="#EEE" stroke-width="1" stroke-dasharray="3,5"/>
+          <text x="110" y="168" font-size="7.5" fill="#CCC" font-family="sans-serif">d=0.74</text>
+        </svg>
+        <p style="font-size:.72rem;color:var(--ink3);margin-top:.65rem;line-height:1.5">Điểm U (bạn) tìm cụm nghề nghiệp có khoảng cách nhỏ nhất trong không gian đặc trưng.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUE -->
+<section id="value">
+  <div class="wrap">
+    <div class="lbl">Giá trị & Phạm vi</div>
+    <h2 class="ttl">Không phải trắc nghiệm —<br><em>đây là decision-support system</em></h2>
+    <p class="sub">Hệ thống không áp dụng heuristic scoring hay rule-based matching. Mọi đề xuất xuất phát từ embedding-based similarity search trong không gian đặc trưng nghề nghiệp đa chiều.</p>
+    <div class="val-contrast">
+      <div class="vc-col">
+        <div class="vc-head">Hệ thống truyền thống</div>
+        <ul class="vc-list">
+          <li>Phân loại tính cách bằng câu hỏi Likert cố định</li>
+          <li>Gán nhóm nghề theo rule cứng — thiếu độ phân giải</li>
+          <li>Không xét điều kiện tài chính hay điểm chuẩn</li>
+          <li>Dữ liệu tĩnh, không cập nhật theo thị trường lao động</li>
+        </ul>
+      </div>
+      <div class="vc-col">
+        <div class="vc-head">Hệ thống này</div>
+        <ul class="vc-list">
+          <li>User profile mã hóa thành normalized vector RIASEC × O*NET</li>
+          <li>Nearest neighbor search — kết quả liên tục, không nhị phân</li>
+          <li>Post-inference constraint layer: điểm chuẩn + học phí VN</li>
+          <li>Kiến trúc hỗ trợ periodic retraining khi thị trường thay đổi</li>
+        </ul>
+      </div>
+    </div>
+    <div class="val-grid">
+      <div class="val-card"><span class="val-icon">⚙️</span><h3>Embedding-based matching</h3><p>Hồ sơ người dùng và nghề nghiệp biểu diễn trong cùng một không gian vector. Mức độ phù hợp là giá trị liên tục — không phải nhãn "phù hợp / không phù hợp".</p></div>
+      <div class="val-card"><span class="val-icon">🔒</span><h3>Constraint filtering sau inference</h3><p>Điểm chuẩn và học phí các trường đại học Việt Nam hoạt động như hard constraint — loại bỏ lộ trình không khả thi trước khi trả kết quả.</p></div>
+      <div class="val-card"><span class="val-icon">📡</span><h3>Inference chạy client-side</h3><p>Toàn bộ tính toán thực thi trên trình duyệt — không phụ thuộc kết nối máy chủ. Hoạt động ổn định trên mạng 3G yếu.</p></div>
+      <div class="val-card"><span class="val-icon">🔁</span><h3>Kiến trúc hỗ trợ retraining</h3><p>Tách biệt offline training và online inference — có thể cập nhật dữ liệu và tái huấn luyện định kỳ mà không ảnh hưởng trải nghiệm người dùng.</p></div>
+    </div>
+    <div class="impact">
+      <div class="impact-ico">🏫</div>
+      <div class="impact-txt">
+        <strong>Triển khai được ở cả cấp độ trường học — không chỉ người dùng cá nhân</strong>
+        <span>Giáo viên chủ nhiệm có thể dùng hệ thống như công cụ tư vấn hướng nghiệp cho cả lớp — mở rộng từ B2C sang B2B2C mà không cần thay đổi hạ tầng.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRY -->
+<section id="try">
+  <div class="wrap">
+    <div class="lbl" style="text-align:center">Phỏng vấn AI</div>
+    <h2 class="ttl" style="text-align:center">Chia sẻ về bản thân —<br><em>AI sẽ hỏi thêm nếu cần</em></h2>
+    <p class="sub" style="text-align:center;margin:0 auto 2.5rem">Trả lời tự nhiên. Hệ thống đánh giá chất lượng câu trả lời theo thời gian thực và hỏi thêm khi cần để phân tích chính xác hơn.</p>
+
+    <div class="form-wrap">
+      <div id="quiz">
+        <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+        <div class="step-track" id="step-track"></div>
+        <div id="qbox"></div>
+      </div>
+
+      <div id="loading">
+        <div class="spin"></div>
+        <p class="loading-title">AI đang phân tích hồ sơ của bạn...</p>
+        <div class="l-steps">
+          <div class="l-step" id="ls1">Trích xuất đặc trưng từ câu trả lời</div>
+          <div class="l-step" id="ls2">Mã hóa vector hồ sơ RIASEC × O*NET</div>
+          <div class="l-step" id="ls3">Tính điểm tương đồng với cơ sở dữ liệu nghề</div>
+          <div class="l-step" id="ls4">Lọc theo điểm chuẩn và học phí thực tế</div>
+        </div>
+      </div>
+
+      <div id="result">
+        <div class="r-head"><h2>Kết quả phân tích của bạn</h2><p id="rsub">Dựa trên hồ sơ RIASEC và ràng buộc thực tế</p></div>
+        <div class="fv" id="fv"><div class="fv-lbl">Vector đặc trưng đã trích xuất</div><div class="fv-tags" id="fvtags"></div></div>
+        <div class="careers" id="careers"></div>
+        <div class="r-note">Gợi ý dựa trên mô hình RIASEC × O*NET kết hợp ràng buộc điểm chuẩn và học phí Việt Nam.<br>Hệ thống thực tế sẽ phân tích chi tiết hơn với đầy đủ dữ liệu đào tạo.</div>
+        <button class="btn-reset" onclick="reset()">↺ Làm lại từ đầu</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="f-logo"><span>Hướng</span>Nghiệp AI</div>
+  <div class="f-note">Dữ liệu: RIASEC (Holland) · O*NET · Điểm chuẩn Việt Nam 2024</div>
+</footer>
 
 <script>
+// ════════════════════════════════════════════════════════
+// ADAPTIVE Q&A ENGINE — HướngNghiệp AI
+// Tích hợp đánh giá chất lượng 3 mức (đỏ/vàng/xanh):
+//   ĐỎ   (score < 0.2) → khóa nút, yêu cầu trả lời lại
+//   VÀNG (score 0.2–0.45) → cho qua, inject câu hỏi thêm
+//   XANH (score ≥ 0.45) → đủ thông tin, tiếp tục bình thường
+// ════════════════════════════════════════════════════════
 
-function extract(text){
-text=text.toLowerCase()
+var MIN=10, answers=[], qHistory=[], totalSignals=0;
 
-let interest=[]
-let academic=[]
-let finance=0
+// Ngưỡng đánh giá chất lượng
+var THRESH_RED    = 0.2;   // dưới mức này → yêu cầu trả lời lại
+var THRESH_YELLOW = 0.45;  // dưới mức này → inject follow-up khi submit
 
-if(/lập trình|phần mềm|ai|công nghệ/.test(text)) interest.push('I')
-if(/toán|lý/.test(text)) academic.push('logic')
-if(/gia đình|hỗ trợ|ngân sách/.test(text)) finance=1
+// Nội dung thông báo theo trạng thái
+var STATUS_MSGS = {
+  red: {
+    icon: '⚠️',
+    text: 'Câu trả lời quá ngắn hoặc chưa có thông tin cụ thể. Hãy mô tả chi tiết hơn để tiếp tục.'
+  },
+  yellow: {
+    icon: '💡',
+    text: 'Câu trả lời chưa đầy đủ — AI sẽ hỏi thêm để bổ sung thông tin còn thiếu.'
+  },
+  green: {
+    icon: '✓',
+    text: 'Câu trả lời đủ thông tin. Tiếp tục để phân tích.'
+  }
+};
 
-return {interest,academic,finance}
+// ── QUESTION BANK ──────────────────────────────────────
+var CORE=[
+  {id:'c1',dim:'interest',
+   lbl:'Sở thích',
+   q:'Khi có thời gian tự do, bạn thường làm gì? Kể cụ thể một hoặc hai hoạt động bạn thực sự thích.',
+   ph:'Ví dụ: Mình hay xem video về lập trình và tự học code...',
+   followups:[
+     {id:'f1a',dim:'interest',
+      q:'Trong những hoạt động đó, bạn thích phần nào nhất — tự tay làm ra thứ gì, hay tìm hiểu và phân tích?',
+      ph:'Ví dụ: Mình thích nhất lúc code xong và thấy chương trình chạy được...'},
+     {id:'f1b',dim:'interest',
+      q:'Có môn học hoặc chủ đề nào ngoài trường mà bạn tự tìm hiểu thêm không?',
+      ph:'Ví dụ: Mình hay đọc thêm về lịch sử chiến tranh, hoặc xem kênh khoa học...'}
+   ]},
+  {id:'c2',dim:'academic',
+   lbl:'Năng lực học tập',
+   q:'Ở trường, bạn học tốt và thích nhất môn gì? Điểm số tổng quát của bạn như thế nào?',
+   ph:'Ví dụ: Mình học tốt Toán và Lý, điểm trung bình khoảng 8.5, dự định thi khối A...',
+   followups:[
+     {id:'f2a',dim:'academic',
+      q:'Bạn học khối gì hoặc định thi tổ hợp môn nào vào đại học?',
+      ph:'Ví dụ: Mình học ban tự nhiên, dự thi khối A00 (Toán-Lý-Hóa)...'},
+     {id:'f2b',dim:'academic',
+      q:'Môn nào bạn thấy khó và ít hứng thú nhất?',
+      ph:'Ví dụ: Mình học Văn và Sử khá yếu, không thích lắm...'}
+   ]},
+  {id:'c3',dim:'personality',
+   lbl:'Tính cách',
+   q:'Bạn thích làm việc một mình, với nhóm nhỏ, hay tiếp xúc nhiều người? Mô tả môi trường làm việc lý tưởng.',
+   ph:'Ví dụ: Mình thích làm trong môi trường yên tĩnh, tập trung, có thể làm độc lập...',
+   followups:[
+     {id:'f3a',dim:'personality',
+      q:'Khi gặp vấn đề khó, bạn thường tự giải quyết một mình hay tìm người thảo luận?',
+      ph:'Ví dụ: Mình hay thử tự giải trước rồi mới hỏi thêm...'}
+   ]},
+  {id:'c4',dim:'goal',
+   lbl:'Mục tiêu',
+   q:'Bạn hình dung mình sẽ làm nghề gì trong 10 năm tới? Dù chưa chắc chắn, hãy kể điều bạn muốn đạt được.',
+   ph:'Ví dụ: Mình muốn làm trong lĩnh vực công nghệ, có thể là kỹ sư phần mềm...',
+   followups:[
+     {id:'f4a',dim:'goal',
+      q:'Điều gì khiến bạn hứng thú với hướng đó — thu nhập, đam mê, hay tác động xã hội?',
+      ph:'Ví dụ: Mình thích vì công nghệ đang phát triển nhanh và thu nhập tốt...'},
+     {id:'f4b',dim:'goal',
+      q:'Bạn có idol hay người mà bạn muốn học theo về nghề nghiệp không?',
+      ph:'Ví dụ: Mình thấy các kỹ sư AI ở Google rất hay, hoặc bác sĩ như ba mình...'}
+   ]},
+  {id:'c5',dim:'finance',
+   lbl:'Điều kiện thực tế',
+   q:'Gia đình có thể hỗ trợ học phí khoảng bao nhiêu mỗi năm? Bạn muốn học gần nhà hay sẵn sàng lên thành phố lớn?',
+   ph:'Ví dụ: Gia đình mình có thể chi khoảng 30–40 triệu mỗi năm. Mình sẵn sàng lên Hà Nội...',
+   followups:[
+     {id:'f5a',dim:'finance',
+      q:'Ngoài học phí, gia đình có thể hỗ trợ thêm chi phí sinh hoạt nếu bạn học xa nhà không?',
+      ph:'Ví dụ: Ba mẹ có thể cho thêm khoảng 3–4 triệu/tháng tiền ở và ăn...'}
+   ]}
+];
+
+// ── QUALITY ASSESSMENT ─────────────────────────────────
+function qualityScore(text, dim) {
+  var t = text.toLowerCase(), score = 0;
+  var dimKeywords = {
+    interest: ['thích','mình','hay','thường','sở thích','đam mê','yêu','ghét','chán','vui','buồn',
+               'lập trình','code','vẽ','nhạc','đọc','viết','nấu','chơi','xem','học','nghiên cứu',
+               'thiết kế','thể thao','du lịch','nấu ăn','phim','sách','game'],
+    academic: ['toán','lý','hóa','sinh','văn','anh','sử','địa','tin','điểm','trung bình','khối',
+               'giỏi','khá','tốt','yếu','kém','thi','8','9','7','a0','b0','c0','d0'],
+    personality: ['mình','một mình','nhóm','đội','người','môi trường','yên tĩnh','ồn ào','thích',
+                  'làm việc','tính cách','hướng nội','hướng ngoại','độc lập','hợp tác'],
+    goal: ['muốn','ước','nghề','công việc','tương lai','sau này','kỹ sư','bác sĩ','giáo viên',
+           'làm','thu nhập','tiền','đam mê','đóng góp','thành công','nổi tiếng'],
+    finance: ['triệu','tiền','học phí','gia đình','ba','mẹ','gần','xa','hà nội','hcm','tỉnh',
+              '20','30','40','50','không giới hạn','thoải mái','hạn chế','ít']
+  };
+  var kws = dimKeywords[dim] || [];
+  var hits = kws.filter(function(w){return t.indexOf(w)>=0}).length;
+  score = Math.min(1, hits / 3);
+  if (t.length < 20) score *= 0.2;
+  else if (t.length < 50) score *= 0.55;
+  else if (t.length < 80) score *= 0.8;
+  return score;
 }
 
-function isDataSufficient(f){
-let score=0
-if(f.interest.length) score++
-if(f.academic.length) score++
-if(f.finance>0) score++
-return score>=2
+// Phân loại trạng thái từ điểm
+function getStatus(score) {
+  if (score < THRESH_RED) return 'red';
+  if (score < THRESH_YELLOW) return 'yellow';
+  return 'green';
 }
 
-function analyze(){
-
-let text=document.getElementById('input').value.trim()
-
-let res=document.getElementById('result')
-
-if(text.length<5){
-res.innerHTML=renderBad("Không thể phân tích dữ liệu","Câu trả lời quá ngắn.")
-return
+function getMissingDims() {
+  var coverage = {interest:0, academic:0, personality:0, goal:0, finance:0};
+  answers.forEach(function(a) {
+    var q = getQById(a.qid);
+    if (q) coverage[q.dim] = Math.max(coverage[q.dim], qualityScore(a.text, q.dim));
+  });
+  return Object.keys(coverage).filter(function(d){ return coverage[d] < THRESH_YELLOW; });
 }
 
-let features=extract(text)
-
-let infoScore=0
-if(features.interest.length) infoScore++
-if(features.academic.length) infoScore++
-if(features.finance>0) infoScore++
-
-if(!isDataSufficient(features)){
-if(infoScore==1){
-res.innerHTML=renderWarning("Cần thêm thông tin","Hãy mô tả rõ hơn về sở thích hoặc năng lực.")
-}else{
-res.innerHTML=renderBad("Không thể phân tích dữ liệu","Dữ liệu quá ít hoặc không liên quan.")
-}
-return
+function getQById(id) {
+  for (var i=0;i<CORE.length;i++){
+    if (CORE[i].id===id) return CORE[i];
+    for (var j=0;j<(CORE[i].followups||[]).length;j++)
+      if (CORE[i].followups[j].id===id) return CORE[i].followups[j];
+  }
+  return null;
 }
 
-res.innerHTML=renderGood("Phân tích thành công","Phù hợp nhóm ngành Công nghệ / Kỹ thuật.")
+// ── QUEUE ENGINE ──────────────────────────────────────
+var queue=[];
+var qIdx=0;
 
+function buildInitialQueue() {
+  queue = CORE.map(function(c){ return {q:c, isFollowup:false}; });
+  qIdx = 0;
 }
 
-function renderGood(title,msg){
-return `
-<div class="result-card good">
-<span class="dot green"></span><strong>${title}</strong>
-<p>${msg}</p>
-</div>`
+// Inject follow-up khi trạng thái là vàng hoặc đỏ (sau khi force-retry xong)
+function maybeInjectFollowup(answeredQ, answerText) {
+  var q = answeredQ;
+  if (!q.followups || q.followups.length===0) return;
+  var score = qualityScore(answerText, q.dim);
+  // Inject follow-up khi câu trả lời vàng (0.2–0.45)
+  if (score < THRESH_YELLOW) {
+    var fu = q.followups[0];
+    var already = queue.some(function(item){ return item.q.id===fu.id; });
+    if (!already) {
+      queue.splice(qIdx, 0, {q:fu, isFollowup:true, parentDim:q.dim});
+    }
+  }
 }
 
-function renderWarning(title,msg){
-return `
-<div class="result-card warning">
-<span class="dot yellow"></span><strong>${title}</strong>
-<p>${msg}</p>
-</div>`
+// ── RENDER CURRENT QUESTION ────────────────────────────
+function renderQ() {
+  var item = queue[qIdx];
+  if (!item) { startPipeline(); return; }
+  var q = item.q;
+  var isFollowup = item.isFollowup;
+
+  var pct = Math.round((qIdx / (queue.length + 1)) * 100);
+  document.getElementById('prog').style.width = Math.max(pct, 8) + '%';
+
+  var track = document.getElementById('step-track');
+  track.innerHTML = '';
+  for (var i=0;i<queue.length;i++) {
+    var dot = document.createElement('span');
+    dot.className = 'step-dot' +
+      (i < qIdx ? ' done' : i===qIdx ? ' active' : '') +
+      (queue[i].isFollowup ? ' followup' : '');
+    track.appendChild(dot);
+  }
+
+  var card = document.createElement('div');
+  card.className = 'q-card';
+
+  var badge = isFollowup
+    ? '<span class="q-badge followup">Hỏi thêm · ' + q.dim + '</span>'
+    : '<span class="q-badge core">' + (q.lbl||'Câu hỏi') + ' · ' + (qIdx+1) + ' / ' + queue.length + '</span>';
+
+  var hints = '';
+  if (isFollowup) {
+    var hintMap = {
+      interest: ['Vì đam mê','Vì dễ kiếm tiền','Không biết','Muốn giúp người'],
+      academic: ['Khối A (Toán-Lý-Hóa)','Khối B (Toán-Hóa-Sinh)','Khối C (Văn-Sử-Địa)','Khối D (Toán-Văn-Anh)'],
+      personality: ['Thích làm một mình','Thích làm nhóm','Tùy công việc'],
+      goal: ['Đam mê','Thu nhập tốt','Muốn đóng góp xã hội','Chưa biết'],
+      finance: ['Có thể hỗ trợ sinh hoạt','Chỉ đủ học phí','Gia đình khó khăn']
+    };
+    var hList = hintMap[q.dim] || [];
+    if (hList.length) {
+      hints = '<div style="margin-bottom:.85rem">' +
+        '<span style="font-size:.72rem;color:var(--ink3);display:block;margin-bottom:.3rem">Gợi ý nhanh (bấm để điền):</span>' +
+        hList.map(function(h){
+          return '<span class="hint-chip" onclick="addHint(this,\'' + h + '\')">' + h + '</span>';
+        }).join('') + '</div>';
+    }
+  }
+
+  card.innerHTML =
+    badge +
+    '<div class="f-q">' + q.q + '</div>' +
+    hints +
+    // Status badge — bắt đầu ẩn, hiện sau khi gõ
+    '<div class="status-badge" id="s-badge"><span class="status-dot"></span><span class="s-txt"></span></div>' +
+    '<div class="ans-wrap">' +
+      '<textarea class="ans" id="cur-ans" placeholder="' + q.ph + '" maxlength="400" rows="4"></textarea>' +
+      '<div class="ans-foot">' +
+        '<span class="counter" id="cur-ct">0 / 400</span>' +
+      '</div>' +
+    '</div>' +
+    '<button class="btn-next" id="cur-btn" onclick="submitCur()" disabled>' +
+      (qIdx===queue.length-1 ? 'Phân tích hồ sơ →' : 'Tiếp tục →') +
+    '</button>';
+
+  var box = document.getElementById('qbox');
+  box.innerHTML = '';
+  box.appendChild(card);
+
+  var ta  = document.getElementById('cur-ans');
+  var ct  = document.getElementById('cur-ct');
+  var btn = document.getElementById('cur-btn');
+  var badge_el = document.getElementById('s-badge');
+
+  ta.addEventListener('input', function() {
+    var val = this.value;
+    var l   = val.length;
+    ct.textContent = l + ' / 400';
+    ct.className = 'counter' + (l>350?' warn':'');
+
+    if (l < MIN) {
+      // Quá ngắn — ẩn badge, khóa nút
+      badge_el.className = 'status-badge';
+      ta.className = 'ans';
+      btn.disabled = true;
+      btn.textContent = qIdx===queue.length-1 ? 'Phân tích hồ sơ →' : 'Tiếp tục →';
+      return;
+    }
+
+    var score  = qualityScore(val, q.dim);
+    var status = getStatus(score);
+    var msg    = STATUS_MSGS[status];
+
+    // Cập nhật màu textarea
+    ta.className = 'ans status-' + status;
+
+    // Cập nhật badge
+    badge_el.className = 'status-badge visible ' + status;
+    badge_el.querySelector('.s-txt').textContent = msg.icon + '  ' + msg.text;
+
+    // Điều khiển nút theo trạng thái
+    if (status === 'red') {
+      btn.disabled = true;
+      btn.textContent = 'Cần thêm thông tin ↑';
+    } else {
+      btn.disabled = false;
+      btn.textContent = qIdx===queue.length-1 ? 'Phân tích hồ sơ →' : 'Tiếp tục →';
+    }
+  });
+
+  ta.addEventListener('keydown', function(e){
+    if ((e.ctrlKey||e.metaKey) && e.key==='Enter' && !btn.disabled) submitCur();
+  });
+
+  setTimeout(function(){ ta.focus(); }, 80);
 }
 
-function renderBad(title,msg){
-return `
-<div class="result-card bad">
-<span class="dot red"></span><strong>${title}</strong>
-<p>${msg}</p>
-</div>`
+function addHint(el, text) {
+  var ta = document.getElementById('cur-ans');
+  ta.value = (ta.value + (ta.value?' ':'')).trimStart() + text;
+  ta.dispatchEvent(new Event('input'));
+  ta.focus();
+  el.style.opacity='.4'; el.style.pointerEvents='none';
 }
 
+// ── SUBMIT CURRENT ANSWER ─────────────────────────────
+function submitCur() {
+  var ta  = document.getElementById('cur-ans');
+  var val = ta.value.trim();
+
+  if (val.length < MIN) return;
+
+  var score  = qualityScore(val, queue[qIdx].q.dim);
+  var status = getStatus(score);
+
+  // Đỏ → không cho submit (nút đã bị disabled, nhưng thêm guard)
+  if (status === 'red') return;
+
+  var item = queue[qIdx];
+  answers.push({ qid: item.q.id, dim: item.q.dim, text: val, features: extract(val) });
+
+  // Vàng hoặc xanh: inject follow-up khi cần (chỉ với core question)
+  if (!item.isFollowup) {
+    maybeInjectFollowup(item.q, val);
+  }
+
+  qIdx++;
+
+  var missing   = getMissingDims();
+  var coresDone = CORE.every(function(c){
+    return answers.some(function(a){ return a.qid===c.id; });
+  });
+
+  if (coresDone && missing.length===0) { startPipeline(); return; }
+  if (qIdx >= queue.length)            { startPipeline(); return; }
+
+  renderQ();
+}
+
+// ── FEATURE EXTRACTION ────────────────────────────────
+function extract(txt) {
+  var t=txt.toLowerCase(),f={interest:[],academicStrength:[],financialConstraint:0,careerGoal:''};
+  var RM={
+    R:['sửa','cơ khí','điện','kỹ thuật','robot','máy','lắp','thực hành','hàn','nông','trồng','xây','lắp ráp','công trường'],
+    I:['nghiên cứu','đọc sách','khoa học','tìm hiểu','phân tích','toán','vật lý','hóa','sinh','thí nghiệm','data','ai','lập trình','code','thuật toán','logic','tư duy','khám phá','học hỏi'],
+    A:['vẽ','thiết kế','nhạc','sáng tác','viết','nghệ thuật','sáng tạo','thời trang','nhiếp ảnh','phim','video','kiến trúc','ux','ui','graphic','content','anime','truyện'],
+    S:['giúp đỡ','dạy','bạn bè','gặp gỡ','trò chuyện','hỗ trợ','tình nguyện','cộng đồng','chăm sóc','y tế','điều dưỡng','tâm lý','giáo dục','sư phạm','trẻ em','người già','bệnh nhân','xã hội'],
+    E:['kinh doanh','thuyết phục','lãnh đạo','dẫn dắt','bán hàng','marketing','quản lý','chiến lược','khởi nghiệp','startup','tổ chức','sự kiện','thương mại','đàm phán','tiền','giàu'],
+    C:['kế hoạch','sắp xếp','kế toán','tài chính','excel','số liệu','báo cáo','hành chính','ngân hàng','kiểm toán','thuế','thống kê','cẩn thận','tỉ mỉ','chi tiết','quy trình']
+  };
+  var AM={
+    math:['toán','vật lý','khối a','a00','a01','tự nhiên'],
+    science:['hóa','sinh','khối b','b00','dược','y khoa','nông nghiệp'],
+    language:['văn','tiếng anh','ngoại ngữ','khối d','d01','ielts','toeic','ngôn ngữ'],
+    social:['lịch sử','địa lý','gdcd','khối c','c00','xã hội','chính trị'],
+    tech:['tin học','lập trình','code','it','công nghệ','khối a1','a01','python','java','máy tính'],
+    arts:['nhạc','vẽ','mỹ thuật','thiết kế','kiến trúc','thể thao','nghệ thuật']
+  };
+  var FP=[
+    {r:/dưới\s*20|khoảng\s*1[0-9]|10[-–]20|ít tiền|khó khăn|hạn chế|không nhiều|thấp/i,v:1},
+    {r:/20[-–\s]*40|khoảng\s*[23][0-9]|30[-–]40|trung bình|tầm\s*3/i,v:2},
+    {r:/40[-–\s]*80|tầm\s*[456][0-9]|50[-–]80|khá giả|khá/i,v:3},
+    {r:/không giới hạn|thoải mái|không vấn đề|100|trên\s*80|nhiều tiền|gia đình giàu/i,v:4}
+  ];
+  var GP=[
+    {r:/kỹ sư|lập trình|phần mềm|\bit\b|công nghệ|\bai\b|machine learning/i,g:'Kỹ sư / Công nghệ'},
+    {r:/bác sĩ|y khoa|y tế|dược sĩ|điều dưỡng|chữa bệnh/i,g:'Y tế & Sức khỏe'},
+    {r:/giáo viên|sư phạm|dạy học|giảng dạy/i,g:'Giáo dục & Sư phạm'},
+    {r:/kinh doanh|doanh nhân|khởi nghiệp|startup|marketing/i,g:'Kinh doanh'},
+    {r:/thiết kế|nghệ sĩ|kiến trúc sư|họa sĩ|nhạc sĩ/i,g:'Sáng tạo & Nghệ thuật'},
+    {r:/kế toán|tài chính|ngân hàng|kiểm toán|chứng khoán/i,g:'Tài chính & Kế toán'},
+    {r:/luật sư|pháp lý|luật /i,g:'Luật & Pháp lý'}
+  ];
+  var sc={};
+  for(var k in RM){sc[k]=RM[k].filter(function(w){return t.indexOf(w)>=0}).length;}
+  f.interest=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a]}).filter(function(k){return sc[k]>0}).slice(0,3);
+  for(var d in AM){if(AM[d].some(function(w){return t.indexOf(w)>=0}))f.academicStrength.push(d);}
+  for(var j=0;j<FP.length;j++){if(FP[j].r.test(t)){f.financialConstraint=FP[j].v;break;}}
+  for(var j=0;j<GP.length;j++){if(GP[j].r.test(t)){f.careerGoal=GP[j].g;break;}}
+  return f;
+}
+
+// ── VECTOR ENCODING ───────────────────────────────────
+function encode(feats){
+  var rc={R:0,I:0,A:0,S:0,E:0,C:0},ac={},fc=0,cg='';
+  feats.forEach(function(f){
+    f.interest.forEach(function(t,i){rc[t]=(rc[t]||0)+(3-i);});
+    f.academicStrength.forEach(function(a){ac[a]=(ac[a]||0)+1;});
+    if(f.financialConstraint)fc=f.financialConstraint;
+    if(f.careerGoal)cg=f.careerGoal;
+  });
+  var sr=Object.keys(rc).sort(function(a,b){return rc[b]-rc[a]});
+  var ta=Object.keys(ac).sort(function(a,b){return(ac[b]||0)-(ac[a]||0)})[0]||'math';
+  return{primary:sr[0]||'I',secondary:sr[1]||'C',topAcademic:ta,financialConstraint:fc,careerGoal:cg};
+}
+
+// ── CAREER MATCHING ───────────────────────────────────
+function match(v){
+  var db=[
+    {n:'Kỹ sư Phần mềm / AI',  r:['I','R','C'],a:['tech','math'],t:[2,3,4],s:'Bách Khoa, FPT, KHTN'},
+    {n:'Khoa học Dữ liệu',      r:['I','C'],    a:['tech','math'],t:[2,3,4],s:'KHTN, NEU, FPT'},
+    {n:'An toàn Thông tin',     r:['I','R'],    a:['tech','math'],t:[2,3],  s:'PTIT, Bách Khoa'},
+    {n:'Kỹ sư Cơ khí / XD',    r:['R','I'],    a:['math'],       t:[1,2,3],s:'Bách Khoa, Xây dựng, GTVT'},
+    {n:'Kỹ sư Điện – Điện tử', r:['R','I'],    a:['math'],       t:[1,2,3],s:'Bách Khoa, Điện lực'},
+    {n:'Bác sĩ Đa khoa',        r:['I','S'],    a:['science'],    t:[1,2,3],s:'ĐH Y Hà Nội, YDS HCM'},
+    {n:'Dược sĩ',               r:['I','R'],    a:['science'],    t:[2,3],  s:'Dược HN, Dược HCM'},
+    {n:'Điều dưỡng',            r:['S','R'],    a:['science'],    t:[1,2],  s:'ĐH Y, ĐH Điều dưỡng'},
+    {n:'Quản trị Kinh doanh',   r:['E','C'],    a:['math','social'],t:[2,3,4],s:'UEH, NEU, FTU'},
+    {n:'Tài chính – Ngân hàng', r:['C','E'],    a:['math'],       t:[2,3],  s:'UEH, NEU, HVNH'},
+    {n:'Marketing',             r:['E','A'],    a:['social','language'],t:[2,3,4],s:'UEH, Văn Lang, Duy Tân'},
+    {n:'Kế toán – Kiểm toán',   r:['C'],        a:['math'],       t:[1,2,3],s:'UEH, NEU, UEL'},
+    {n:'Sư phạm',               r:['S','C'],    a:['language','social'],t:[1,2],s:'ĐHSP HN, ĐHSP HCM'},
+    {n:'Tâm lý học',            r:['S','I'],    a:['social'],     t:[2,3],  s:'ĐHSP, KHXH&NV'},
+    {n:'Công tác Xã hội',       r:['S'],        a:['social'],     t:[1,2],  s:'Lao động XH, ĐHSP'},
+    {n:'Thiết kế Đồ họa',       r:['A','I'],    a:['arts'],       t:[2,3,4],s:'Mỹ thuật CN, FPT, RMIT'},
+    {n:'Kiến trúc',             r:['A','R'],    a:['arts','math'],t:[2,3,4],s:'KTS HN, KTS HCM'},
+    {n:'Báo chí & Truyền thông',r:['A','S'],    a:['language'],   t:[2,3],  s:'Học viện BC-TT, HUFLIT'},
+    {n:'Luật',                  r:['E','C'],    a:['language','social'],t:[1,2,3],s:'ĐH Luật HN, ĐH Luật HCM'},
+    {n:'Quan hệ Quốc tế',       r:['E','S'],    a:['language','social'],t:[2,3,4],s:'ĐHQG, Ngoại giao'}
+  ];
+  db.forEach(function(c){
+    var sc=0;
+    if(c.r.indexOf(v.primary)>=0)sc+=3;
+    if(c.r.indexOf(v.secondary)>=0)sc+=1.5;
+    if(c.a.indexOf(v.topAcademic)>=0)sc+=2;
+    c.score=Math.round(sc/6.5*100);
+  });
+  var ranked=db.slice().sort(function(a,b){return b.score-a.score});
+  if(v.financialConstraint){
+    var f=ranked.filter(function(c){return c.t.indexOf(v.financialConstraint)>=0});
+    if(f.length>=3)ranked=f;
+  }
+  return ranked.slice(0,3);
+}
+
+// ── PIPELINE ─────────────────────────────────────────
+function startPipeline(){
+  document.getElementById('prog').style.width='100%';
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('loading').style.display='block';
+  var ids=['ls1','ls2','ls3','ls4'],delays=[500,1100,1800,2400];
+  ids.forEach(function(id,i){
+    setTimeout(function(){
+      if(i>0){var p=document.getElementById(ids[i-1]);p.className='l-step ok';}
+      document.getElementById(id).className='l-step on';
+    },delays[i]);
+  });
+  setTimeout(function(){
+    document.getElementById(ids[3]).className='l-step ok';
+    document.getElementById('loading').style.display='none';
+    render();
+  },3000);
+}
+
+// ── RENDER RESULTS ────────────────────────────────────
+function render(){
+  var feats=answers.map(function(a){return a.features;});
+  var vec=encode(feats),careers=match(vec);
+  var TN={R:'Thực hành',I:'Nghiên cứu',A:'Sáng tạo',S:'Xã hội',E:'Doanh nghiệp',C:'Tổ chức'};
+  var BN={0:'Chưa xác định',1:'< 20tr/năm',2:'20–40tr/năm',3:'40–80tr/năm',4:'Không giới hạn'};
+  var AN={math:'Toán/Lý',science:'Sinh/Hóa',language:'Ngôn ngữ',social:'Xã hội',tech:'Tin học',arts:'Nghệ thuật'};
+  var qCount = answers.length;
+  var fuCount = answers.filter(function(a){
+    var q=getQById(a.qid); return q&&q.id&&q.id[0]==='f';
+  }).length;
+  document.getElementById('rsub').textContent=
+    'RIASEC: '+TN[vec.primary]+' × '+TN[vec.secondary]+
+    ' · Ngân sách: '+BN[vec.financialConstraint]+
+    (vec.careerGoal?' · '+vec.careerGoal:'')+
+    ' · '+qCount+' câu ('+(fuCount?' bao gồm '+fuCount+' hỏi thêm':'không cần hỏi thêm')+')';
+  var tags=[
+    {l:'RIASEC: '+vec.primary+vec.secondary,c:'r'},
+    {l:'Học lực: '+(AN[vec.topAcademic]||vec.topAcademic),c:'a'},
+    {l:'Ngân sách: '+BN[vec.financialConstraint],c:'f'},
+    {l:'Số câu: '+qCount,c:'g'}
+  ];
+  if(vec.careerGoal)tags.push({l:vec.careerGoal,c:'g'});
+  document.getElementById('fvtags').innerHTML=tags.map(function(t){
+    return'<span class="fvt '+t.c+'">'+t.l+'</span>';
+  }).join('');
+  document.getElementById('fv').style.display='block';
+  document.getElementById('careers').innerHTML=careers.map(function(c,i){
+    return'<div class="c-card'+(i===0?' top':'')+'">'+
+      '<div class="c-score">'+c.score+'%</div>'+
+      '<div class="c-info"><h4>'+c.n+'</h4><p>Trường gợi ý: '+c.s+'</p></div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('result').style.display='block';
+}
+
+// ── RESET ─────────────────────────────────────────────
+function reset(){
+  answers=[];queue=[];qIdx=0;
+  ['ls1','ls2','ls3','ls4'].forEach(function(id){
+    document.getElementById(id).className='l-step';
+  });
+  document.getElementById('result').style.display='none';
+  document.getElementById('fv').style.display='none';
+  document.getElementById('loading').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('prog').style.width='8%';
+  buildInitialQueue();
+  renderQ();
+}
+
+// ── INIT ──────────────────────────────────────────────
+buildInitialQueue();
+renderQ();
 </script>
-
 </body>
 </html>
