@@ -614,8 +614,7 @@ function renderQ() {
       hints = '<div style="margin-bottom:.85rem">' +
         '<span style="font-size:.72rem;color:var(--ink3);display:block;margin-bottom:.3rem">Gợi ý nhanh (bấm để điền):</span>' +
         hList.map(function(h){
-          return '<span class="hint-chip" onclick="addHint(this,''+h+'')">' + h + '</span>';
-        }).join('') + '</div>';
+          return '<span class="hint-chip" onclick="addHint(this,\'' + h + '\')">' + h + '</span>';        }).join('') + '</div>';
     }
   }
 
@@ -738,13 +737,13 @@ function extract(txt) {
     {r:/không giới hạn|thoải mái|không vấn đề|100|trên\s*80|nhiều tiền|gia đình giàu/i,v:4}
   ];
   var GP=[
-    {r:/kỹ sư|lập trình|phần mềm|it|công nghệ|ai|machine learning/i,g:'Kỹ sư / Công nghệ'},
+{r:/kỹ sư|lập trình|phần mềm|\bit\b|công nghệ|\bai\b|machine learning/i,g:'Kỹ sư / Công nghệ'},
     {r:/bác sĩ|y khoa|y tế|dược sĩ|điều dưỡng|chữa bệnh/i,g:'Y tế & Sức khỏe'},
     {r:/giáo viên|sư phạm|dạy học|giảng dạy/i,g:'Giáo dục & Sư phạm'},
     {r:/kinh doanh|doanh nhân|khởi nghiệp|startup|marketing/i,g:'Kinh doanh'},
     {r:/thiết kế|nghệ sĩ|kiến trúc sư|họa sĩ|nhạc sĩ/i,g:'Sáng tạo & Nghệ thuật'},
     {r:/kế toán|tài chính|ngân hàng|kiểm toán|chứng khoán/i,g:'Tài chính & Kế toán'},
-    {r:/luật sư|pháp lý|luật/i,g:'Luật & Pháp lý'}
+    {r:/luật sư|pháp lý|luật /i,g:'Luật & Pháp lý'}
   ];
   var sc={};
   for(var k in RM){sc[k]=RM[k].filter(function(w){return t.indexOf(w)>=0}).length;}
